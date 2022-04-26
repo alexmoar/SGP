@@ -1,8 +1,8 @@
 from django.urls import path
 
-from core import views
+from evaluator import views
 
-app_name = 'core'
+app_name = 'evaluator'
 urlpatterns = [
 
 ]

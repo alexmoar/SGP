@@ -1,8 +1,8 @@
 from django.urls import path
 
-from writer import views
+from projects import views
 
-app_name = 'writer'
+app_name = 'projects'
 urlpatterns = [
 
 ]
