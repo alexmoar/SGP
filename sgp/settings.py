@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'administrator',
     'authentication',
     'evaluator',
-    'writer'
+    'writer',
+    'projects',
 ]
 
 MIDDLEWARE = [
