@@ -1,0 +1,11 @@
+.idea/*
+/**/**/**/*.pyc
+db.sqlite3
+media/*
+locale/**/**/.mo
+locale/es/LC_MESSAGES/django.mo
+venv/*
+./**/static/*
+.coverage
+htmlcov/*
+static/theme/media/*
