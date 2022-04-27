@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from django.contrib import messages
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -120,6 +121,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+LOGOUT_REDIRECT_URL = reverse_lazy('authentication:login')
+LOGIN_URL = reverse_lazy('authentication:login')
+LOGIN_REDIRECT_URL = reverse_lazy('authentication:login')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

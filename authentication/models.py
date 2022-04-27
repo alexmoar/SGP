@@ -50,4 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    @property
+    def get_role(self):
+        return self.get_role_display()
+
     full_name.fget.short_description = "Nombre"

@@ -20,7 +20,9 @@ from django.conf.urls.static import static
 from sgp import settings
 
 urlpatterns = [
-    path('', include('authentication.urls')),
-    path('administrator', include('administrator.urls')),
     path('admin/', admin.site.urls),
+    path('', include('authentication.urls')),
+    path('administrator/', include('administrator.urls')),
+    path('evaluator/', include('evaluator.urls')),
+    path('writer/', include('writer.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

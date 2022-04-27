@@ -21,6 +21,7 @@
     <link href="{% static 'bower_components/perfect-scrollbar/css/perfect-scrollbar.min.css' %}" rel="stylesheet">
     <link href="{% static 'bower_components/slick-carousel/slick/slick.css' %}" rel="stylesheet">
     <link href="{% static 'css/main.css' %}?version=4.1.0" rel="stylesheet">
+      {% block extra_css %}{% endblock %}
   </head>
   <body {% block body_tags %}{% endblock %}>
     {% block content %}{% endblock %}
@@ -52,5 +53,6 @@
     <script src="{% static 'bower_components/bootstrap/js/dist/tooltip.js' %}"></script>
     <script src="{% static 'bower_components/bootstrap/js/dist/popover.js' %}"></script>
     <script src="{% static 'js/main.js' %}?version=4.1.0"></script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>
