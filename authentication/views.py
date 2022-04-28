@@ -1,21 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 
-from authentication.models import User
+from authentication.models import UserInformation
 
 
 def redirect_session(request):
     if request.user.is_authenticated:
-        user = User.objects.get(id=request.user.id)
-        if user.role == User.ADMIN:
+        user = UserInformation.objects.get(id=request.user.id)
+        if user.role == UserInformation.ADMIN:
             return redirect(reverse_lazy('administrator:dashboard'))
-        elif user.role == User.EVALUATOR:
+        elif user.role == UserInformation.EVALUATOR:
             return redirect(reverse_lazy('evaluator:dashboard'))
-        elif user.role == User.WRITER:
+        elif user.role == UserInformation.WRITER:
             return redirect(reverse_lazy('writer:dashboard'))
         else:
             messages.warning(request, 'Usuario sin rol para el sistema')
@@ -70,15 +71,15 @@ class SignUpView(View):
             message = "Las contraseñas no coinciden."
 
         if not message:
-            user = User(
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                role=role
-            )
+            user = User(username=username, first_name=first_name, last_name=last_name, email=email)
             user.set_password(password)
             user.save()
+
+            user_information = UserInformation(
+                user=user,
+                role=role
+            )
+            user_information.save()
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
