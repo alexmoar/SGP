@@ -9,3 +9,12 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Category(BaseModel):
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = "categories"
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"

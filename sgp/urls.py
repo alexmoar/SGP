@@ -24,5 +24,6 @@ urlpatterns = [
     path('', include('authentication.urls')),
     path('administrator/', include('administrator.urls')),
     path('evaluator/', include('evaluator.urls')),
+    path('projects/', include('projects.urls')),
     path('writer/', include('writer.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

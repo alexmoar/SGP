@@ -166,14 +166,34 @@ $(function () {
   // #8. SELECT 2 ACTIVATION
 
   if ($('.select2').length) {
-    $('.select2').select2();
+    $('.select2').select2()
+
+        /*.on('change', function(e){
+        $("#categories").val($("#categories-base").val())
+	});*/
   }
 
   // #9. CKEDITOR ACTIVATION
 
-  if ($('#ckeditor1').length) {
-    CKEDITOR.replace('ckeditor1');
+  if ($('#ckeditor-main').length) {
+    // CKEDITOR.replace('ckeditor-main')
+    CKEDITOR.replace('ckeditor-main')
+        /*.on('change', function(e) {
+      $('#description').val(e.editor.getData())
+    });*/
   }
+
+  if ($('#answer-1').length) {
+    CKEDITOR.replace('answer-1');
+  }
+/*
+  if ($('#ckeditor4').length) {
+    CKEDITOR.replace('ckeditor4');
+  }
+
+  if ($('#ckeditor5').length) {
+    CKEDITOR.replace('ckeditor5');
+  }*/
 
   // #10. CHARTJS CHARTS http://www.chartjs.org/
 
@@ -489,12 +509,13 @@ $(function () {
       var donutChart = $("#donutChart");
 
       // donut chart data
+
       var data = {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple"],
+        labels: ["Calificado", "Enviado", "Por corregir", "En corrección"],
         datasets: [{
-          data: [300, 50, 100, 30, 70],
-          backgroundColor: ["#5797fc", "#7e6fff", "#4ecc48", "#ffcc29", "#f37070"],
-          hoverBackgroundColor: ["#5797fc", "#7e6fff", "#4ecc48", "#ffcc29", "#f37070"],
+          data: [qualified, send, for_correction, in_correction],
+          backgroundColor: ["#4ecc48", "#5797fc", "#dc3225", "#FFCC29FF"],
+          hoverBackgroundColor: ["#4ecc48", "#5797fc", "#DC3225FF", "#FFCC29FF"],
           borderWidth: 0
         }]
       };
