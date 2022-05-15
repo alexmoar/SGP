@@ -3,7 +3,7 @@
 <!-------------------- START - Mobile Menu  -------------------->
 <div class="menu-mobile menu-activated-on-click color-scheme-dark">
     <div class="mm-logo-buttons-w">
-        <a class="mm-logo" href="{% url 'writer:dashboard' %}">
+        <a class="mm-logo" href="{% url 'writer:projects' %}">
             <img src="{% static 'img/logo.png' %}">
             <span>{{ request.user.username }}</span>
         </a>
@@ -19,7 +19,7 @@
     <div class="menu-and-user">
         <div class="logged-user-w">
             <div class="avatar-w">
-                <a href="{% url 'writer:dashboard' %}">
+                <a href="{% url 'writer:projects' %}">
                     <img alt="" src="{% static 'img/avatar1.jpg' %}">
                 </a>
             </div>
@@ -48,7 +48,7 @@
 <!--------------------  START - Menu side -------------------->
 <div class="desktop-menu menu-side-w menu-activated-on-click" id="desktop-menu">
     <div class="logo-w">
-        <a class="logo" href="{% url 'writer:dashboard' %}">
+        <a class="logo" href="{% url 'writer:projects' %}">
             <div class="logo-element"></div>
             <div class="logo-label">
                 {{ request.user.username }}
@@ -59,7 +59,7 @@
         <div class="logged-user-w">
             <div class="logged-user-i">
                 <div class="avatar-w">
-                    <a href="{% url 'writer:dashboard' %}">
+                    <a href="{% url 'writer:projects' %}">
                         <img alt="" src="{% static 'img/avatar1.jpg' %}">
                     </a>
                 </div>

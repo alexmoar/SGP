@@ -17,7 +17,7 @@ def redirect_session(request):
         elif user.role == UserInformation.EVALUATOR:
             return redirect(reverse_lazy('evaluator:dashboard'))
         elif user.role == UserInformation.WRITER:
-            return redirect(reverse_lazy('writer:dashboard'))
+            return redirect(reverse_lazy('writer:projects'))
         else:
             messages.warning(request, 'Usuario sin rol para el sistema')
             return redirect(reverse_lazy('authentication:logout'))

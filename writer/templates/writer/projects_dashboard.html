@@ -1,5 +1,5 @@
 {% extends 'writer/base_writer.html' %}
-{% load static %}
+{% load static writer_tag %}
 
 
 {% block extra_css %}
@@ -105,48 +105,43 @@
 
 {% block content_block %}
     <div id="v-app">
-        <h4 class="todo-content-header">
-            <i class="os-icon os-icon-ui-83"></i><span>Editar proyecto</span>
-        </h4>
-        <div class="all-tasks-w">
-            {% include 'writer/edit/content_data_general.html' %}
-            {% include 'writer/edit/content_data_items.html' %}
-            {% include 'writer/edit/content_data_files.html' %}
-        </div>
-        <div class="form-buttons-w text-right">
-            <button class="btn btn-secondary"
-                    data-target="#deleteProjectModal"
-                    data-toggle="modal">
-                Eliminar
-            </button>
-            <button class="btn btn-info step-trigger-btn">
-                Guardar borrador
-            </button>
-            <button @click="" class="btn btn-primary step-trigger-btn">
-                Continuar
-            </button>
-        </div>
-
-        <div aria-hidden="true" class="modal fade" id="deleteProjectModal" role="dialog" tabindex="-1">
-            <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content">
-                    <div class="modal-header faded smaller">
-                        <div class="modal-title">
-                            <span>{{ project.title }} </span>
-                        </div>
-                        <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
-                                aria-hidden="true"> &times;</span></button>
-                    </div>
-                    <div class="modal-body row">
-                        <div class="col-12">
-                            <h4>Estás seguro de querer eliminar este proyecto?</h4>
+        <div class="row">
+            <div class="col-sm-4">
+                <h4 class="todo-content-header">
+                    <i class="os-icon os-icon-ui-83"></i><span>Datos generales</span>
+                </h4>
+                <div class="element-box">
+                    <div class="el-chart-w">
+                        <canvas height="120" id="donutChart" width="120"></canvas>
+                        <div class="inside-donut-chart-label">
+                            <strong>{{ total_projects }}</strong><span>Total proyectos</span>
                         </div>
                     </div>
-                    <div class="modal-footer buttons-on-left">
-                        <button class="btn btn-teal" type="button" @click="deleteProject({{ project.id }})">
-                            Si, eliminar
-                        </button>
-                        <button class="btn btn-link" data-dismiss="modal" type="button">Cancelar</button>
+                    <div class="el-legend">
+                        <div class="legend-value-w">
+                            <div class="legend-pin" style="background-color: #FFCC29FF;"></div>
+                            <div class="legend-value">
+                                En borrador
+                            </div>
+                        </div>
+                        <div class="legend-value-w">
+                            <div class="legend-pin" style="background-color: #6896f9;"></div>
+                            <div class="legend-value">
+                                Enviados
+                            </div>
+                        </div>
+                        <div class="legend-value-w">
+                            <div class="legend-pin" style="background-color: #d97b70;"></div>
+                            <div class="legend-value">
+                                Por corregir
+                            </div>
+                        </div>
+                        <div class="legend-value-w">
+                            <div class="legend-pin" style="background-color: #4ecc48;"></div>
+                            <div class="legend-value">
+                                Calificados
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,7 +150,16 @@
 {% endblock %}
 
 {% block _js %}
+    <script>
+        {% get_projects request 'for_correction' as projects_for_correction %}
+        {% get_projects request 'send' as projects_send %}
+        {% get_projects request 'draft' as projects_draft %}
+        {% get_projects request 'qualified' as projects_qualified %}
 
-    {% include 'writer/edit/script.html' %}
+        let qualified = {{ projects_qualified|count }};
+        let send = {{ projects_send|count }};
+        let for_correction = {{ projects_for_correction|count }};
+        let draft = {{ projects_draft|count }};
+    </script>
 
 {% endblock %}

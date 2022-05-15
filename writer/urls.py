@@ -4,9 +4,8 @@ from writer import views
 
 app_name = 'writer'
 urlpatterns = [
-    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    path('', views.ProjectsDashboardView.as_view(), name='projects'),
     path('profile/', views.UserProfileView.as_view(), name='profile'),
-    path('projects/list/', views.ProjectsListView.as_view(), name='list_projects'),
     path('projects/edit/<int:id>', views.ProjectsEditView.as_view(), name='edit_project'),
     path('projects/questions/<int:id>', views.ProjectQuestionsView.as_view(), name='get_questions_project'),
     path('projects/questions-detail/<int:id>', views.ProjectDescriptionQuestionView.as_view(),

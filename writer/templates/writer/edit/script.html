@@ -1,0 +1,469 @@
+<script src="https://unpkg.com/vue@3"></script>
+s
+<script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+    }
+  }
+</script>
+
+<script type="module">
+
+    import {createApp} from 'vue';
+
+let app = createApp({
+    delimiters: ['${', '}'],
+    data() {
+        return {
+            show_intro: false,
+            items: [1],
+            questions: [],
+            files: [],
+            files_pdf: [],
+            count: 1,
+            id_project: {{project.id}},
+            title: "{{ project.title }}",
+            description: `{% autoescape off %}{{ project.description }}{% endautoescape %}`,
+            categories: [{% for c in categories_project %}{{ c.id }},{% endfor %}],
+            status: "{{ project.status }}",
+            itemEdit: {
+                id: '',
+                title: '',
+                answer: ''
+            },
+            itemDelete: {
+                id: '',
+                title: '',
+            },
+        }
+    },
+    created() {
+    },
+    mounted() {
+        this.setDescription();
+    },
+    computed: {
+        isFilesGallery() {
+            let files = this.files.filter(i => i.type_file !== 'pdf' && !i.delete)
+            return files.length > 0;
+        }
+    },
+    methods: {
+        setDescription() {
+            if ($('#description').length) {
+                CKEDITOR.replace('description');
+                CKEDITOR.instances['description'].setData(`${this.description}`);
+            }
+        },
+        editGeneralData() {
+            $('.select2.select2-container.select2-container--default').css("width", "100%");
+        },
+
+        deleteProject(id) {
+            let vm = this;
+            let url = "{% url 'writer:edit_project' 0 %}";
+            url = url.replace('0', id);
+            fetch(url, {
+                method: "delete",
+                body: JSON.stringify({
+                    'id': id,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'success')
+                            setTimeout(()=>{window.location.href = "{% url 'writer:projects' %}";}, 2000)
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.error(response)
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+
+        showSectionFiles() {
+            let vm = this;
+            fetch(
+                "{% url 'projects:get_file' project.id %}"
+            ).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.log(response)
+                            vm.files = response['files']
+                            vm.renderFiles(response['files'])
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.error(response)
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+        renderFiles(files) {
+            let html_input = "";
+            let html_wrap = "";
+            let html_thumbnails = "";
+            let style = "";
+            for(let i = 0; i<files.length; i++) {
+                if (files[i]['type_file'] === 'pdf') continue
+                html_input += `
+                    <input type="radio" id="image${i+1}" name="gallery-control" ${i === 0 ? 'checked': '' }>
+                `;
+
+                html_wrap += `
+                    <figure>
+                        <label for="fullscreen">
+                            <img src="${files[i]['file']}" alt="image${i+1}"/>
+                        </label>
+                    </figure>
+                `;
+
+                html_thumbnails += `
+                    <label for="image${i+1}"
+                           class="thumb"
+                           style="background-image: url('${files[i]['file']}')"></label>
+                `;
+
+                style += `
+                    .gallery input#image${i + 1}:checked ~ .wrap figure {
+                        -webkit-transform: translateX(-${i}00%);
+                        transform: translateX(-${i}00%);
+                    }
+                    .gallery input#image${i + 1}:checked ~ .wrap figure:not(:nth-of-type(${i + 1})) {
+                        opacity: 0;
+                    }
+                    .gallery input#image${i + 1}:checked ~ .thumbnails .slider {
+                        -webkit-transform: translateY(${i}00%);
+                        transform: translateY(${i}00%);
+                    }
+                    .gallery input#image${i + 1}:checked ~ .thumbnails .thumb:nth-of-type(${i + 1}) {
+                        opacity: 1;
+                        cursor: default;
+                    }
+                `;
+
+
+            }
+            document.head.insertAdjacentHTML("beforeend", `<style>${style}</style>`)
+            let carousel = document.getElementById('carousel');
+
+            carousel.innerHTML = `
+                ${html_input}
+                <input type="checkbox" id="fullscreen" name="gallery-fullscreen-control"/>
+                <div class="wrap">${html_wrap}</div>
+                <div class="thumbnails">
+                    <div class="slider">
+                        <div class="indicator"></div>
+                    </div>
+                    ${html_thumbnails}
+                </div>
+            `;
+
+        },
+        deleteFile(id) {
+            let vm = this;
+            vm.files.filter(item => {
+                if(item['id'] === id) {
+                    item['delete'] = true;
+                    vm.fetchDeleteFile(id);
+                }
+            })
+        },
+        fetchDeleteFile(id) {
+            let vm = this;
+            let url = "{% url 'projects:get_file' 0 %}";
+            url = url.replace('0', id);
+            fetch(url, {
+                method: "delete",
+                body: JSON.stringify({
+                    'id': id,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.log(response)
+                            createToast(response.message, 'success')
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.error(response)
+                        });
+                }
+
+            })
+        },
+
+        getCategories() {
+            if ($('.select2').length) {
+                return $("#categories").val()
+            }
+        },
+        getDescription(field) {
+            if ($(`#${field}`).length) {
+                return CKEDITOR.instances[field].getData()
+            }
+        },
+        fetchProject() {
+            let vm = this;
+            vm.categories = vm.getCategories()
+            vm.description = vm.getDescription('description')
+            fetch("{% url 'writer:add_project' %}", {
+                method: "put",
+                body: JSON.stringify({
+                    'id': vm.id_project,
+                    'title': vm.title,
+                    'description': vm.description,
+                    'categories': vm.categories,
+                    'status': vm.status
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            if (response.message) {
+                                createToast(response.message, 'success')
+                                vm.id_project = response['id']
+                            }
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+
+        getItemsProject() {
+            let vm = this;
+            fetch(
+                "{% url 'writer:get_questions_project' project.id %}"
+            ).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            vm.questions = response['questions'].map(item => {
+                                item['delete'] = false
+                                return item
+                            })
+                            vm.count = vm.questions.length
+                            return this.fetchProject(2)
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+        editItemProject(id) {
+            let vm = this;
+            vm.questions.filter(item => {
+                if(item['id'] === id) {
+                    item['show'] = !item['show']
+                    if(item['show']) {
+                        let url = "{% url 'writer:get_question_detail' 0 %}";
+                        url = url.replace('0', id);
+                        fetch(
+                            url
+                        ).then(response => {
+                            if (response.status === 200) {
+                                response.json()
+                                    .catch(error => console.log(error))
+                                    .then(response => {
+                                        vm.itemEdit = response;
+
+                                        if ($(`#answer-edit`).length) {
+                                            let editor = CKEDITOR.instances[`answer-edit`];
+                                            if (editor) {
+                                                editor.destroy(true);
+                                            }
+                                            CKEDITOR.replace(`answer-edit`);
+                                            CKEDITOR.instances['answer-edit'].setData(`${vm.itemEdit.answer}`);
+                                        }
+                                    });
+                            } else {
+                                response.json()
+                                    .catch(error => console.log(error))
+                                    .then(response => {
+                                        createToast(response.message, 'error')
+                                    });
+                            }
+
+                        })
+                    }
+                }
+            })
+        },
+        createItem() {
+            let vm = this;
+            let data = []
+            for (let i = 0; i < this.items.length; i++) {
+                let v = this.items[i]
+                let title = document.getElementById(`title-${v}`).value
+                let answer = this.getDescription(`answer-${this.items[i]}`)
+                data.push({
+                    'title': title,
+                    'answer': answer,
+                })
+            }
+            if(data) {
+                fetch("{% url 'writer:add_questions' %}", {
+                    method: "post",
+                    body: JSON.stringify({
+                        'id_project': vm.id_project,
+                        'questions': data,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        response.json()
+                            .catch(error => console.log(error))
+                            .then(response => {
+                                vm.questions.push(response.questions[0])
+                                document.getElementById('close-create-item').click();
+                                createToast(response.message, 'success')
+                            });
+                    } else {
+                        response.json()
+                            .catch(error => console.log(error))
+                            .then(response => {
+                                createToast(response.message, 'error')
+                            });
+                    }
+
+                })
+            }
+
+        },
+        updateQuestion() {
+            let vm = this;
+            let id = vm.itemEdit.id
+            let title = document.getElementById(`title-edit`).value
+            let answer = this.getDescription(`answer-edit`)
+            let url = "{% url 'writer:get_question_detail' 0 %}";
+            url = url.replace('0', id);
+            fetch(url, {
+                method: "put",
+                body: JSON.stringify({
+                    'id': id,
+                    'title': title,
+                    'answer': answer,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            let res = response.item
+                            vm.questions.filter(item => {
+                                if(item['id'] === res['id']) {
+                                    item.title = res.title
+                                }
+                            });
+                            createToast(response.message, 'success')
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+        setItemDelete(item) {
+            this.itemDelete = item
+        },
+        deleteItem(id) {
+            let vm = this;
+            vm.questions.filter(item => {
+                if(item['id'] === id) {
+                    item['delete'] = true;
+                    vm.fetchDeleteItem(id);
+                }
+            })
+        },
+        fetchDeleteItem(id) {
+            let vm = this;
+            let url = "{% url 'writer:get_question_detail' 0 %}";
+            url = url.replace('0', id);
+            fetch(url, {
+                method: "delete",
+                body: JSON.stringify({
+                    'id': id,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.log(response)
+                            document.getElementById('close-delete-item').click();
+                            createToast(response.message, 'success')
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+    }
+})
+
+app.mount('#v-app')
+
+</script>

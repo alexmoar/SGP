@@ -53,12 +53,11 @@ class UserProfileView(LoginRequiredMixin, View):
             return redirect(reverse_lazy('writer:profile'))
 
 
-class DashboardView(LoginRequiredMixin, View):
-    template_name = "writer/dashboard.html"
+class ProjectsDashboardView(LoginRequiredMixin, View):
+    template_name = "writer/projects_dashboard.html"
 
     def get(self, request, *args, **kwargs):
         user = UserInformation.objects.get(user_id=request.user.id)
-        projects = Project.objects.filter(author=request.user).order_by('-created_at')[:6]
         qualified = Project.objects.filter(status=Project.QUALIFIED).count()
         send = Project.objects.filter(status=Project.SEND).count()
         for_correction = Project.objects.filter(
@@ -68,27 +67,11 @@ class DashboardView(LoginRequiredMixin, View):
         total_projects = Project.objects.all().count()
         return render(request, self.template_name, {
             'user': user,
-            'projects': projects,
             'qualified': qualified,
             'send': send,
             'for_correction': for_correction,
             'in_correction': in_correction,
             'total_projects': total_projects,
-        })
-
-    def post(self, request, *args, **kwargs):
-        pass
-
-
-class ProjectsListView(LoginRequiredMixin, View):
-    template_name = "writer/projects_list.html"
-
-    def get(self, request, *args, **kwargs):
-        user = UserInformation.objects.get(user_id=request.user.id)
-        projects = Project.objects.filter(author=request.user)
-        return render(request, self.template_name, {
-            'user': user,
-            'projects': projects
         })
 
 
@@ -98,14 +81,27 @@ class ProjectsEditView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = UserInformation.objects.get(user_id=request.user.id)
         project = Project.objects.get(id=kwargs.get('id'), author_id=request.user.id)
-        categories_project = [cat.id for cat in project.category.only('id')]
+        categories_project = [{'id': cat.id, 'name': cat.name} for cat in project.category.only('id', 'name')]
         categories = Category.objects.all()
         return render(request, self.template_name, {
             'user': user,
             'project': project,
             'categories_project': categories_project,
             'categories': categories,
+            'count_items': Question.objects.filter(
+                project_id=kwargs.get('id'),
+                project__author_id=request.user.id
+            ).count()
         })
+
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        query = Project.objects.get(
+            id=data.get('id'),
+            author_id=request.user.id
+        )
+        query.delete()
+        return JsonResponse(status=200, data={'id': query.id, 'message': 'Proyecto eliminado'})
 
 
 class ProjectQuestionsView(LoginRequiredMixin, View):
@@ -128,6 +124,15 @@ class ProjectDescriptionQuestionView(LoginRequiredMixin, View):
         )
         return JsonResponse(status=200, data={'id': query.id, 'title': query.title, 'answer': query.answer})
 
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        query = Question.objects.get(
+            id=data.get('id'),
+            project__author_id=request.user.id
+        )
+        query.delete()
+        return JsonResponse(status=200, data={'id': query.id, 'message': 'Item eliminado'})
+
     def put(self, request, *args, **kwargs):
         data = json.loads(request.body)
         query = Question.objects.get(
@@ -145,7 +150,9 @@ class ProjectDescriptionQuestionView(LoginRequiredMixin, View):
         if is_changed:
             query.save()
 
-        return JsonResponse(status=200, data={'id': query.id, 'message': 'Item guardado exitosamente'})
+        return JsonResponse(status=200,
+                            data={'item': {'id': query.id, 'title': query.title},
+                                  'message': 'Item actualizado exitosamente'})
 
 
 class AddProjectView(LoginRequiredMixin, View):
@@ -172,7 +179,7 @@ class AddProjectView(LoginRequiredMixin, View):
 
     def put(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        id_project = data.get('id_project', None)
+        id_project = data.get('id', None)
         if not id_project:
             return JsonResponse(status=400, data={'message': 'Id proyecto no identificado'})
 
@@ -194,18 +201,17 @@ class AddQuestionsProjectView(LoginRequiredMixin, View):
         if not id_project:
             return JsonResponse(status=400, data={'message': 'Id proyecto no identificado'})
 
-        questions = data.get('questions', None)
-        for q in questions:
-            Question.objects.create(
+        questions = list()
+        for q in data.get('questions', None):
+            q = Question.objects.create(
                 title=q.get('title'),
                 answer=q.get('answer'),
                 project_id=id_project
             )
-
-        return JsonResponse(status=200, data={'id': id_project})
-
-    def put(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        id_project = data.get('id', None)
-
-        return JsonResponse(status=200, data={'id': id_project})
+            questions.append({
+                'id': q.id,
+                'title': q.title,
+                'answer': q.answer
+            })
+        print(questions)
+        return JsonResponse(status=200, data={'questions': questions, 'message': 'Item creado exitosamente'})

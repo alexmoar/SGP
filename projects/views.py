@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -26,6 +28,15 @@ class GetFileView(View):
         )
         data = [{'id': f.id, 'name': f.name, 'type_file': f.type_file, 'file': f"/media/{f.file}"} for f in files]
         return JsonResponse(status=200, data={'files': data})
+
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        query = FilesApp.objects.get(
+            id=data.get('id'),
+            project__author_id=request.user.id
+        )
+        query.delete()
+        return JsonResponse(status=200, data={'id': query.id, 'message': 'Archivo eliminado'})
 
 
 @method_decorator(csrf_exempt, name='dispatch')

@@ -1,8 +1,6 @@
-{% extends 'base.html' %}
-
+{% extends 'writer/base_writer.html' %}
 {% load static %}
 
-{% block body_tags %}class="with-content-panel"{% endblock %}
 
 {% block extra_css %}
     <link href="{% static 'icon_fonts_assets/batch-icons/style.css' %}" rel="stylesheet">
@@ -70,57 +68,26 @@
 {% endblock extra_css %}
 
 
-{% block content %}
-    <div class="all-wrapper menu-side with-side-panel" id="app">
-        <div class="layout-w">
-
-            {% include 'writer/sidebar-left.html' %}
-
-            <div class="content-w">
-                <!--------------------  START - Breadcrumbs  -------------------->
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="">Home</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="">Products</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <span>Laptop with retina screen</span>
-                    </li>
-                </ul>
-                <!--------------------
-                END - Breadcrumbs
-                -------------------->
-                <div class="content-i">
-                    <div class="content-box">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="element-wrapper">
-                                    <h6 class="element-header">
-                                        Agregar un nuevo proyecto
-                                    </h6>
-                                    <div class="element-box">
-                                        <div class="steps">
-                                            <div class="contents">
-                                                {% include 'writer/add/step_1.html' %}
-                                                {% include 'writer/add/step_2.html' %}
-                                                {% include 'writer/add/step_3.html' %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+{% block content_block %}
+    <h4 class="todo-content-header">
+        <i class="os-icon os-icon-ui-83"></i><span>Agregar un nuevo proyecto</span>
+    </h4>
+    <div class="all-tasks-w" id="app">
+        <div class="tasks-section">
+            <div class="steps">
+                <div class="contents">
+                    {% include 'writer/add/step_1.html' %}
+                    {% include 'writer/add/step_2.html' %}
+                    {% include 'writer/add/step_3.html' %}
                 </div>
             </div>
+            {% csrf_token %}
         </div>
-        {% csrf_token %}
     </div>
+
 {% endblock %}
 
-{% block extra_js %}
+{% block _js %}
 
     <script src="https://unpkg.com/vue@3"></script>
 
@@ -293,7 +260,7 @@ let app = createApp({
                 it = document.getElementById(`item-0`);
             }
             let i = document.createElement('div')
-            i.setAttribute("class", "col-md-6");
+            i.setAttribute("class", "col-12");
             i.setAttribute("id", `item-${this.count}`);
             i.innerHTML = `
                         <div class="element-box bg-item">
@@ -337,4 +304,4 @@ app.mount('#app')
     </script>
 
 
-{% endblock extra_js %}
+{% endblock %}

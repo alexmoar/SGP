@@ -511,9 +511,9 @@ $(function () {
       // donut chart data
 
       var data = {
-        labels: ["Calificado", "Enviado", "Por corregir", "En corrección"],
+        labels: ["Calificado", "Enviado", "Por corregir", "Borrador"],
         datasets: [{
-          data: [qualified, send, for_correction, in_correction],
+          data: [qualified, send, for_correction, draft],
           backgroundColor: ["#4ecc48", "#5797fc", "#dc3225", "#FFCC29FF"],
           hoverBackgroundColor: ["#4ecc48", "#5797fc", "#DC3225FF", "#FFCC29FF"],
           borderWidth: 0
@@ -693,7 +693,7 @@ $(function () {
   });
 
   // Drag init
-  if ($('.tasks-list').length) {
+  /*if ($('.tasks-list').length) {
     // INIT DRAG AND DROP FOR Todo Tasks
     var dragulaTasksObj = dragula($('.tasks-list').toArray(), {
       moves: function moves(el, container, handle) {
@@ -707,7 +707,7 @@ $(function () {
       new_pipeline_body.removeClass('over');
       var old_pipeline_body = $(source).closest('.tasks-list');
     });
-  }
+  }*/
 
   // Task actions init
 

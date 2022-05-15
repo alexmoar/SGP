@@ -1,11 +1,15 @@
-<div class="step-content" id="stepContent3" v-show="step==3">
-    <div class="element-wrapper">
-        <h5 class="form-header">
+<div class="tasks-section">
+    <div class="tasks-header-w">
+        <a class="tasks-header-toggler" href="#" @click="showSectionFiles">
+            <i class="os-icon os-icon-ui-23"></i>
+        </a>
+        <h5 class="tasks-header">
             Archivos adjuntos
         </h5>
-        <div class="form-desc">
-            En esta sección (si aplica), adjunta lo(s) archivo(s) de tu proyecto.
-        </div>
+        <span class="tasks-sub-header">Wed, Sep 25th</span>
+    </div>
+    <div class="tasks-list-w" style="display: none;">
+        <p>En esta sección (si aplica), adjunta lo(s) archivo(s) de tu proyecto.</p>
         <div class="element-box-content">
             <div class="container-fluid">
                 <template v-for="f in files">
@@ -21,7 +25,7 @@
                                     </a>
                                 </template>
                             </h5>
-                            <button class="close btn-remove" type="button" @click="deleteItem(f.id)">
+                            <button class="close btn-remove" type="button" @click="deleteFile(f.id)">
                                 <span class="os-icon os-icon-close"></span>
                             </button>
                         </div>
@@ -29,7 +33,7 @@
                 </template>
             </div>
         </div>
-        <div class="row" v-show="files.length > 0">
+        <div class="row" v-show="files.length > 0 && isFilesGallery">
             <div class="col-sm-12">
                 <div class="element-wrapper">
                     <div class="element-box">
@@ -55,16 +59,5 @@
                 </div>
             </div>
         </form>
-        <div class="form-buttons-w text-right">
-            <button class="btn btn-secondary step-trigger-btn"
-                    @click="changeStep(2)">Volver
-            </button>
-            <button @click="saveDraft(3)" class="btn btn-info step-trigger-btn">
-                Guardar borrador
-            </button>
-            <button @click="saveQuestions" class="btn btn-primary step-trigger-btn">
-                Continuar
-            </button>
-        </div>
     </div>
 </div>
