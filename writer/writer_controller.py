@@ -41,9 +41,12 @@ class WriterController:
 
         is_updated = cls.update_categories(project, data.get('categories'), is_updated)
 
-        message = ''
         if is_updated:
             project.save()
             message = 'Proyecto actualizado'
+            alert = 'success'
+        else:
+            message = 'No tenemos información para actualizar'
+            alert = 'warning'
 
-        return message, project.id
+        return message, alert, project.id

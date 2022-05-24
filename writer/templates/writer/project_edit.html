@@ -97,7 +97,18 @@
         .tasks-list-w.general-data {
             padding: 15px;
             border-radius: 10px;
-            background-color: #eeeeee;
+            background-color: #F9F9F9;
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+        .tasks-header.tasks-header-toggler {
+            position: relative!important;
+            left: 0!important;
+            top: 10px!important;
+            color: #334151!important;
+            cursor: pointer;
         }
     </style>
 {% endblock extra_css %}
@@ -105,26 +116,45 @@
 
 {% block content_block %}
     <div id="v-app">
-        <h4 class="todo-content-header">
-            <i class="os-icon os-icon-ui-83"></i><span>Editar proyecto</span>
-        </h4>
-        <div class="all-tasks-w">
-            {% include 'writer/edit/content_data_general.html' %}
-            {% include 'writer/edit/content_data_items.html' %}
-            {% include 'writer/edit/content_data_files.html' %}
+        <div id="stepContent1" v-show="step==1">
+            <h4 class="todo-content-header">
+                <i class="os-icon os-icon-ui-83"></i><span>{{ project.title }}</span>
+            </h4>
+            <div class="all-tasks-w">
+                {% include 'writer/edit/content_data_general.html' %}
+                {% include 'writer/edit/content_data_items.html' %}
+                {% include 'writer/edit/content_data_files.html' %}
+            </div>
+            <div class="form-buttons-w text-right" v-if="isEditable">
+                <button class="btn btn-secondary"
+                        data-target="#deleteProjectModal"
+                        data-toggle="modal">
+                    Eliminar
+                </button>
+                <button @click="draftProject" class="btn btn-info step-trigger-btn">
+                    Guardar borrador
+                </button>
+                <button @click="showStep(2)" class="btn btn-primary step-trigger-btn">
+                    Continuar
+                </button>
+            </div>
         </div>
-        <div class="form-buttons-w text-right">
-            <button class="btn btn-secondary"
-                    data-target="#deleteProjectModal"
-                    data-toggle="modal">
-                Eliminar
-            </button>
-            <button class="btn btn-info step-trigger-btn">
-                Guardar borrador
-            </button>
-            <button @click="" class="btn btn-primary step-trigger-btn">
-                Continuar
-            </button>
+        <div id="stepContent2" v-show="step==2">
+            <h4 class="todo-content-header text-center">
+                <i class="os-icon os-icon-ui-83"></i>
+                <span>
+                    Estás a un paso de enviar tu proyecto para que una persona experta evalúe tu proyecto.
+                </span>
+            </h4>
+            <div class="form-buttons-w text-center">
+                <button class="btn btn-secondary"
+                        @click="showStep(1)">
+                    Volver
+                </button>
+                <button @click="sendProject" class="btn btn-primary step-trigger-btn">
+                    Enviar
+                </button>
+            </div>
         </div>
 
         <div aria-hidden="true" class="modal fade" id="deleteProjectModal" role="dialog" tabindex="-1">

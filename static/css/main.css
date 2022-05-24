@@ -2848,6 +2848,10 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
   transition: all 0.2s ease-in-out;
 }
 
+.btn {
+  cursor: pointer;
+}
+
 .btn:focus, .all-wrapper .fc-button:focus, .btn:hover, .all-wrapper .fc-button:hover {
   text-decoration: none;
 }

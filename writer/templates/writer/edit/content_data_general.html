@@ -1,11 +1,11 @@
 <div class="tasks-section">
     <div class="tasks-header-w">
         <a class="tasks-header-toggler" href="#"><i class="os-icon os-icon-ui-23"></i></a>
-        <h5 class="tasks-header">
+        <h5 class="tasks-header tasks-header-toggler">
             Datos generales
         </h5>
         <span class="tasks-sub-header">{{ project.created_at }}</span>
-        <a class="add-task-btn"
+        <a class="add-task-btn" v-if="isEditable"
            @click="editGeneralData"
            data-target="#editDataGeneralModal"
            data-toggle="modal" href="#"><i
@@ -13,7 +13,7 @@
         </a>
     </div>
     <div class="tasks-list-w general-data" style="display: none">
-        <h2 class="">
+        <h2>
             ${ title }
         </h2>
         <br>

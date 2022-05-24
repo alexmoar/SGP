@@ -3,7 +3,7 @@
         <a class="tasks-header-toggler" href="#" @click="showSectionFiles">
             <i class="os-icon os-icon-ui-23"></i>
         </a>
-        <h5 class="tasks-header">
+        <h5 class="tasks-header tasks-header-toggler" @click="showSectionFiles">
             Archivos adjuntos
         </h5>
         <span class="tasks-sub-header">Wed, Sep 25th</span>
@@ -25,7 +25,7 @@
                                     </a>
                                 </template>
                             </h5>
-                            <button class="close btn-remove" type="button" @click="deleteFile(f.id)">
+                            <button v-if="isEditable" class="close btn-remove" type="button" @click="deleteFile(f.id)">
                                 <span class="os-icon os-icon-close"></span>
                             </button>
                         </div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <form enctype="multipart/form-data" method="post"
+        <form v-if="isEditable" enctype="multipart/form-data" method="post"
               action="{% url 'projects:upload_files' %}"
               class="dropzone" id="my-awesome-dropzone">
             {% csrf_token %}

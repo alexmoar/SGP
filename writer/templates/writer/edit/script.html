@@ -1,5 +1,5 @@
 <script src="https://unpkg.com/vue@3"></script>
-s
+
 <script type="importmap">
   {
     "imports": {
@@ -16,7 +16,7 @@ let app = createApp({
     delimiters: ['${', '}'],
     data() {
         return {
-            show_intro: false,
+            step: 1,
             items: [1],
             questions: [],
             files: [],
@@ -47,6 +47,10 @@ let app = createApp({
         isFilesGallery() {
             let files = this.files.filter(i => i.type_file !== 'pdf' && !i.delete)
             return files.length > 0;
+        },
+        isEditable() {
+            console.log(this.status)
+            return !(this.status === 'send' || this.status === 'qualified')
         }
     },
     methods: {
@@ -252,7 +256,7 @@ let app = createApp({
                         .catch(error => console.log(error))
                         .then(response => {
                             if (response.message) {
-                                createToast(response.message, 'success')
+                                createToast(response.message, response.alert)
                                 vm.id_project = response['id']
                             }
                         });
@@ -276,12 +280,13 @@ let app = createApp({
                     response.json()
                         .catch(error => console.log(error))
                         .then(response => {
+                            console.log(response['questions'])
                             vm.questions = response['questions'].map(item => {
                                 item['delete'] = false
                                 return item
                             })
                             vm.count = vm.questions.length
-                            return this.fetchProject(2)
+                            // return this.fetchProject(2)
                         });
                 } else {
                     response.json()
@@ -461,6 +466,21 @@ let app = createApp({
 
             })
         },
+
+        showStep(step) {
+            this.step = step;
+        },
+        draftProject() {
+            this.status = 'draft'
+            this.fetchProject()
+        },
+        sendProject() {
+            this.status = 'send'
+            this.fetchProject()
+            setTimeout(() => {
+                location.reload();
+            }, 1000)
+        }
     }
 })
 

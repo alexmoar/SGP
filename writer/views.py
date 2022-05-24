@@ -183,12 +183,13 @@ class AddProjectView(LoginRequiredMixin, View):
         if not id_project:
             return JsonResponse(status=400, data={'message': 'Id proyecto no identificado'})
 
-        message, project_id = WriterController.update_project(id_project, data)
+        message, alert, project_id = WriterController.update_project(id_project, data)
 
         return JsonResponse(
             status=200,
             data={
                 'message': message,
+                'alert': alert,
                 'id': project_id
             }
         )
