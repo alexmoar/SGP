@@ -121,25 +121,25 @@
                         <div class="legend-value-w">
                             <div class="legend-pin" style="background-color: #FFCC29FF;"></div>
                             <div class="legend-value">
-                                En borrador
+                                En borrador <span id="draftCount"></span>
                             </div>
                         </div>
                         <div class="legend-value-w">
                             <div class="legend-pin" style="background-color: #6896f9;"></div>
                             <div class="legend-value">
-                                Enviados
+                                Enviados <span id="sendCount"></span>
                             </div>
                         </div>
                         <div class="legend-value-w">
                             <div class="legend-pin" style="background-color: #d97b70;"></div>
                             <div class="legend-value">
-                                Por corregir
+                                Por corregir <span id="forCorrectionCount"></span>
                             </div>
                         </div>
                         <div class="legend-value-w">
                             <div class="legend-pin" style="background-color: #4ecc48;"></div>
                             <div class="legend-value">
-                                Calificados
+                                Calificados <span id="qualifiedCount"></span>
                             </div>
                         </div>
                     </div>
@@ -160,6 +160,11 @@
         let send = {{ projects_send|count }};
         let for_correction = {{ projects_for_correction|count }};
         let draft = {{ projects_draft|count }};
+
+        document.getElementById('qualifiedCount').innerText = `(${qualified})`;
+        document.getElementById('forCorrectionCount').innerText = `(${for_correction})`;
+        document.getElementById('sendCount').innerText = `(${send})`;
+        document.getElementById('draftCount').innerText = `(${draft})`;
     </script>
 
 {% endblock %}
