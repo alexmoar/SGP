@@ -1,4 +1,4 @@
-from projects.models import Project
+from projects.models import Project, Question
 
 
 class WriterController:
@@ -6,8 +6,6 @@ class WriterController:
     def update_categories(project: Project, categories: list, is_updated: bool):
         """"""
         categories_old = list(project.category.all().only('id').values_list('id', flat=True))
-        print("categories_old: ", categories_old)
-        print("categories: ", categories)
         for c in categories_old:
             if not str(c) in categories:
                 project.category.remove(c)
@@ -50,3 +48,32 @@ class WriterController:
             alert = 'warning'
 
         return message, alert, project.id
+
+    @classmethod
+    def update_questions(cls, data, request):
+        """Update questions items project"""
+        query = Question.objects.get(
+            id=int(data.get('id')),
+            project__author_id=request.user.id
+        )
+        is_changed = False
+        if query.title != data.get('title'):
+            query.title = data.get('title')
+            is_changed = True
+        if query.answer != data.get('answer'):
+            query.answer = data.get('answer')
+            is_changed = True
+
+        if is_changed:
+            query.save()
+
+        return query
+
+    @classmethod
+    def delete_question(cls, data, request):
+        query = Question.objects.get(
+            id=int(data.get('id')),
+            project__author_id=request.user.id
+        )
+        query.delete()
+        return query

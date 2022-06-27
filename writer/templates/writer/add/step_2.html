@@ -11,36 +11,40 @@
             </div>
             <div class="row">
                 <div id="item-0"></div>
-                <div class="col-md-12" id="item-1">
-                    <div class="element-box bg-item">
-                        <button class="close btn-delete-item" type="button" @click="removeItem(1)">
-                            <span class="os-icon os-icon-close"></span>
-                        </button>
-                        <div class="form-group">
-                            <label for="">Item #1</label>
-                            <input class="form-control"
-                                   name="title-1"
-                                   id="title-1"
-                                   placeholder="Agrega un título del proyecto"
-                                   maxlength="255"
-                                   type="text">
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <h5 class="form-header">
-                                    Respuesta
-                                </h5>
-                                <div class="form-desc">
-                                    Agrega tu respuesta
+                <template v-for="item in questions">
+                    <div class="col-md-12" :id="'item-'+item.id_tmp" v-show="item.delete==0">
+                        <input type="hidden" :id="'id_tmp-'+item.id_tmp" :value="item.id_tmp">
+                        <input type="hidden" :id="'id-'+item.id_tmp" v-model="item.id">
+                        <div class="element-box bg-item">
+                            <button class="close btn-delete-item" type="button" @click="removeItem(item.id_tmp)">
+                                <span class="os-icon os-icon-close"></span>
+                            </button>
+                            <div class="form-group">
+                                <label for="">Item #${item.id_tmp}</label>
+                                <input class="form-control"
+                                       :name="'title-'+item.id_tmp"
+                                       :id="'title-'+item.id_tmp"
+                                       placeholder="Agrega un título del proyecto"
+                                       maxlength="255"
+                                       type="text">
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <h5 class="form-header">
+                                        Respuesta
+                                    </h5>
+                                    <div class="form-desc">
+                                        Agrega tu respuesta
+                                    </div>
+                                    <textarea cols="80"
+                                              :id="'answer-'+item.id_tmp"
+                                              :name="'answer-'+item.id_tmp"
+                                              rows="5"></textarea>
                                 </div>
-                                <textarea cols="80"
-                                          id="answer-1"
-                                          name="answer-1"
-                                          rows="5"></textarea>
                             </div>
                         </div>
                     </div>
-                </div>
+                </template>
                 <div class="col-md-12">
                     <div class="element-box add-item"
                          @click="addItem">

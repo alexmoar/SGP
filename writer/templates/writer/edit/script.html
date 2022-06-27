@@ -32,6 +32,7 @@ let app = createApp({
                 title: '',
                 answer: ''
             },
+            showItem: false,
             itemDelete: {
                 id: '',
                 title: '',
@@ -336,6 +337,7 @@ let app = createApp({
                     }
                 }
             })
+            vm.showItem = true;
         },
         createItem() {
             let vm = this;

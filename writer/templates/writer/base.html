@@ -67,10 +67,10 @@
                 }
             },
             mounted() {
-                this.checkDarkMode()
+                // this.checkDarkMode()
             },
             methods: {
-                setDarkMode() {
+                /*setDarkMode() {
                     if ($('body').hasClass('color-scheme-dark')) {
                         localStorage.setItem('dark-mode', '0')
                     } else {
@@ -107,7 +107,7 @@
                     }
 
                     return false;
-                },
+                },*/
                 closeIntro() {
                     fetch('http://127.0.0.1:8000/api/user/{{ request.user.id }}/', {
                         method: 'PUT',

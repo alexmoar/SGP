@@ -110,6 +110,19 @@
             color: #334151!important;
             cursor: pointer;
         }
+        .show-item {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            background-color: #fff;
+            z-index: 99;
+            left: 0;
+            top: 0;
+            overflow: scroll;
+        }
+        .cke_dialog {
+            z-index: 10010;
+        }
     </style>
 {% endblock extra_css %}
 
@@ -139,23 +152,7 @@
                 </button>
             </div>
         </div>
-        <div id="stepContent2" v-show="step==2">
-            <h4 class="todo-content-header text-center">
-                <i class="os-icon os-icon-ui-83"></i>
-                <span>
-                    Estás a un paso de enviar tu proyecto para que una persona experta evalúe tu proyecto.
-                </span>
-            </h4>
-            <div class="form-buttons-w text-center">
-                <button class="btn btn-secondary"
-                        @click="showStep(1)">
-                    Volver
-                </button>
-                <button @click="sendProject" class="btn btn-primary step-trigger-btn">
-                    Enviar
-                </button>
-            </div>
-        </div>
+        {% include 'writer/step_end.html' with step=2 step_back=1 %}
 
         <div aria-hidden="true" class="modal fade" id="deleteProjectModal" role="dialog" tabindex="-1">
             <div class="modal-dialog modal-md" role="document">

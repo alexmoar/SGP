@@ -64,7 +64,7 @@ class ProjectsDashboardView(LoginRequiredMixin, View):
             Q(status=Project.FOR_CORRECTION) | Q(status=Project.DRAFT) | Q(status=Project.CREATED)
         ).count()
         in_correction = Project.objects.filter(status=Project.IN_CORRECTION).count()
-        total_projects = Project.objects.all().count()
+        total_projects = Project.objects.filter(author_id=request.user.id).count()
         return render(request, self.template_name, {
             'user': user,
             'qualified': qualified,
@@ -101,7 +101,14 @@ class ProjectsEditView(LoginRequiredMixin, View):
             author_id=request.user.id
         )
         query.delete()
-        return JsonResponse(status=200, data={'id': query.id, 'message': 'Proyecto eliminado'})
+        return JsonResponse(
+            status=200,
+            data={
+                'id': query.id,
+                'message': 'Proyecto eliminado',
+                'alert': 'info'
+            }
+        )
 
 
 class ProjectQuestionsView(LoginRequiredMixin, View):
@@ -126,33 +133,26 @@ class ProjectDescriptionQuestionView(LoginRequiredMixin, View):
 
     def delete(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        query = Question.objects.get(
-            id=data.get('id'),
-            project__author_id=request.user.id
+        query = WriterController.delete_question(data, request)
+        return JsonResponse(
+            status=200,
+            data={
+                'id': query.id,
+                'message': 'Item eliminado',
+                'alert': 'info'
+            }
         )
-        query.delete()
-        return JsonResponse(status=200, data={'id': query.id, 'message': 'Item eliminado'})
 
     def put(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        query = Question.objects.get(
-            id=data.get('id'),
-            project__author_id=request.user.id
+        query = WriterController.update_questions(data, request)
+        return JsonResponse(
+            status=200,
+            data={
+                'item': {'id': query.id, 'title': query.title},
+                'message': 'Item actualizado exitosamente'
+            }
         )
-        is_changed = False
-        if query.title != data.get('title'):
-            query.title = data.get('title')
-            is_changed = True
-        if query.answer != data.get('answer'):
-            query.answer = data.get('answer')
-            is_changed = True
-
-        if is_changed:
-            query.save()
-
-        return JsonResponse(status=200,
-                            data={'item': {'id': query.id, 'title': query.title},
-                                  'message': 'Item actualizado exitosamente'})
 
 
 class AddProjectView(LoginRequiredMixin, View):
@@ -175,13 +175,20 @@ class AddProjectView(LoginRequiredMixin, View):
         for c in categories:
             project.category.add(c)
 
-        return JsonResponse(status=200, data={'id': project.id})
+        return JsonResponse(
+            status=200,
+            data={
+                'id': project.id,
+                'message': 'Proyecto creado exitosamente',
+                'alert': 'success'
+            }
+        )
 
     def put(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        id_project = data.get('id', None)
+        id_project = data.get('id_project', None)
         if not id_project:
-            return JsonResponse(status=400, data={'message': 'Id proyecto no identificado'})
+            return JsonResponse(status=400, data={'message': 'Id proyecto no identificado', 'alert': 'warning'})
 
         message, alert, project_id = WriterController.update_project(id_project, data)
 
@@ -200,19 +207,39 @@ class AddQuestionsProjectView(LoginRequiredMixin, View):
         data = json.loads(request.body)
         id_project = data.get('id_project', None)
         if not id_project:
-            return JsonResponse(status=400, data={'message': 'Id proyecto no identificado'})
+            return JsonResponse(
+                status=400,
+                data={
+                    'message': 'Id proyecto no identificado',
+                    'alert': 'warning'
+                }
+            )
 
         questions = list()
         for q in data.get('questions', None):
-            q = Question.objects.create(
-                title=q.get('title'),
-                answer=q.get('answer'),
-                project_id=id_project
-            )
+            if q.get('id', None):
+                if q.get('delete') == 1:
+                    query = WriterController.delete_question(q, request)
+                else:
+                    query = WriterController.update_questions(q, request)
+            else:
+                query = Question.objects.create(
+                    title=q.get('title'),
+                    answer=q.get('answer'),
+                    project_id=id_project
+                )
             questions.append({
-                'id': q.id,
-                'title': q.title,
-                'answer': q.answer
+                'id': query.id,
+                'id_tmp': q.get('id_tmp'),
+                'delete': q.get('delete'),
+                'title': query.title,
+                'answer': query.answer
             })
-        print(questions)
-        return JsonResponse(status=200, data={'questions': questions, 'message': 'Item creado exitosamente'})
+        return JsonResponse(
+            status=200,
+            data={
+                'questions': questions,
+                'message': 'Items creados exitosamente',
+                'alert': 'success'
+            }
+        )

@@ -79,6 +79,7 @@
                     {% include 'writer/add/step_1.html' %}
                     {% include 'writer/add/step_2.html' %}
                     {% include 'writer/add/step_3.html' %}
+                    {% include 'writer/step_end.html' with step=4 step_back=3 %}
                 </div>
             </div>
             {% csrf_token %}
@@ -111,6 +112,24 @@ let app = createApp({
         return {
             show_intro: false,
             items: [1],
+            saved: false,
+            questions: [
+                {
+                    'id_tmp': 1,
+                    'title': '',
+                    'answer': '',
+                    'delete': 0,
+                }
+            ],
+            itemEdit: {
+                id: '',
+                title: '',
+                answer: ''
+            },
+            itemDelete: {
+                id: '',
+                title: '',
+            },
             count: 1,
             id_project: null,
             title: "",
@@ -136,6 +155,7 @@ let app = createApp({
         },
         fetchProject(step) {
             let vm = this;
+            alert(vm.id_project ? "put" : "post")
             fetch("{% url 'writer:add_project' %}", {
                 method: vm.id_project ? "put" : "post",
                 body: JSON.stringify({
@@ -156,7 +176,8 @@ let app = createApp({
                         .then(response => {
                             console.log(response['id'])
                             vm.id_project = response['id']
-                            return this.changeStep(step)
+                            createToast(response.message, response.alert)
+                            return vm.changeStep(step)
                         });
                 } else {
                     response.json()
@@ -174,23 +195,28 @@ let app = createApp({
         saveDraft(step) {
             this.status = 'draft'
             this.fetchProject(step)
-            this.saveQuestions()
+            this.saveQuestions();
+            createToast('Proyecto guardado como borrador exitosamente', 'info')
         },
         saveQuestions() {
             let vm = this;
             let data = []
             for (let i = 0; i < this.items.length; i++) {
                 let v = this.items[i]
-                console.log("V: ", v)
+                let id = document.getElementById(`id-${v}`).value
+                let id_tmp = document.getElementById(`id_tmp-${v}`).value
                 let title = document.getElementById(`title-${v}`).value
                 let answer = this.getDescription(`answer-${this.items[i]}`)
                 data.push({
+                    'id_tmp': id_tmp,
+                    'id': id,
                     'title': title,
                     'answer': answer,
+                    'delete': vm.is_delete(id_tmp),
                 })
             }
             console.log(data)
-            console.table(data)
+
             if(data) {
                 fetch("{% url 'writer:add_questions' %}", {
                     method: "post",
@@ -207,9 +233,12 @@ let app = createApp({
                         response.json()
                             .catch(error => console.log(error))
                             .then(response => {
-                                console.log(response['id'])
-                                vm.id_project = response['id']
+                                let q = response['questions'];
+                                console.log(q)
+                                vm.saved = true;
+                                vm.questions = response['questions'];
 
+                                createToast(response.message, response.alert)
                             });
                     } else {
                         response.json()
@@ -242,15 +271,40 @@ let app = createApp({
                 return $("#categories").val()
             }
         },
-        removeItem(item) {
-            let el = document.getElementById(`item-${item}`)
-            for (let i = 0; i < this.items.length; i++) {
-                if (this.items[i] === parseInt(item)) {
+        is_delete(id_tmp) {
+            let is_delete = 0;
+            this.questions.filter(item => {
+                if(item.id && item.delete === 1 && parseInt(item.id_tmp) === parseInt(id_tmp)) {
+                    item.delete = 1
+                    is_delete = 1
+                }
+            });
+            return is_delete;
+        },
+        removeItem(item_id) {
+            // let el = document.getElementById(`item-${item}`)
+            /*for (let i = 0; i < this.items.length; i++) {
+                if (this.items[i] === parseInt(item_id)) {
                     this.items.splice(i, 1);
                     break;
                 }
-            }
-            el.remove()
+            }*/
+            this.questions.filter(item => {
+                console.log(item)
+                console.log(item.id_tmp, ' == ', item_id)
+                if(item.id && parseInt(item.id_tmp) === parseInt(item_id)) {
+                    console.log('deleting item: ', item_id)
+                    item.delete = 1
+                }
+            })
+            // el.remove()
+        },
+        sendProject() {
+            this.status = 'send'
+            this.fetchProject()
+            setTimeout(() => {
+                location.reload();
+            }, 1000)
         },
         addItem() {
             this.count += 1;
@@ -259,10 +313,17 @@ let app = createApp({
             if (!it) {
                 it = document.getElementById(`item-0`);
             }
+            this.questions.push({
+                'id_tmp': this.count,
+                'id': '',
+                'title': '',
+                'answer': '',
+                'delete': 0,
+            });
             let i = document.createElement('div')
             i.setAttribute("class", "col-12");
             i.setAttribute("id", `item-${this.count}`);
-            i.innerHTML = `
+            /*i.innerHTML = `
                         <div class="element-box bg-item">
                             <button class="close btn-delete-item" type="button" onclick="removeItem(${this.count})">
                                 <span class="os-icon os-icon-close"></span>
@@ -289,12 +350,14 @@ let app = createApp({
                                 </div>
                             </div>
                         </div>
-                    `;
+                    `;*/
 
-            it.insertAdjacentElement("afterend", i);
-            if ($(`#answer-${this.count}`).length) {
-                CKEDITOR.replace(`answer-${this.count}`);
-            }
+            // it.insertAdjacentElement("afterend", i);
+            setTimeout(()=>{
+                if ($(`#answer-${this.count}`).length) {
+                    CKEDITOR.replace(`answer-${this.count}`);
+                }
+            }, 1000)
         }
     }
 })
