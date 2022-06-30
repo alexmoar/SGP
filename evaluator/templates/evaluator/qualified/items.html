@@ -1,0 +1,53 @@
+<div class="element-box-content">
+    <div class="container-fluid">
+        <template v-for="q in questions">
+            <div class="row" v-if="!q.delete">
+                <div class="example-column title-resume-item col-12">
+                    <h5 @click="editItemProject(q.id)"
+                        data-target="#itemModal"
+                        data-toggle="modal">${q.title}</h5>
+                    <button class="close btn-remove"
+                            type="button" @click="editItemProject(q.id)"
+                    >
+                        ${q.score}/5
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<div class="show-item" v-show="showItem">
+    <div>
+        <div class="modal-header faded smaller">
+            <div class="modal-title">
+                <span>${itemEdit.title}</span>
+            </div>
+            <button class="close" @click="showItem=false" type="button"><span
+                    aria-hidden="true"> &times;</span></button>
+        </div>
+        <div class="modal-body">
+            <div v-html="itemEdit.answer"></div>
+            <hr>
+            <h3 class="text-center">Calificación: ${ itemEdit.score }/5</h3>
+            <div class="form-radio">
+                <label class="radio-control">
+                    <input type="radio" name="qualification" value="1" v-model="itemEdit.score" @click="setScore(1, itemEdit.id)"> 1
+                </label>
+                <label class="radio-control">
+                    <input type="radio" name="qualification" value="2" v-model="itemEdit.score" @click="setScore(2, itemEdit.id)"> 2
+                </label>
+                <label class="radio-control">
+                    <input type="radio" name="qualification" value="3" v-model="itemEdit.score" @click="setScore(3, itemEdit.id)"> 3
+                </label>
+                <label class="radio-control">
+                    <input type="radio" name="qualification" value="4" v-model="itemEdit.score" @click="setScore(4, itemEdit.id)"> 4
+                </label>
+                <label class="radio-control">
+                    <input type="radio" name="qualification" value="5" v-model="itemEdit.score" @click="setScore(5, itemEdit.id)"> 5
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+

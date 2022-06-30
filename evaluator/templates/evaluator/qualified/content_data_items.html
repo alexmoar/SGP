@@ -1,0 +1,19 @@
+<div class="tasks-section">
+    <div class="tasks-header-w">
+        <a class="tasks-header-toggler" href="#" @click="getItemsProject">
+            <i class="os-icon os-icon-ui-23"></i>
+        </a>
+        <h5 class="tasks-header tasks-header-toggler" @click="getItemsProject">
+            Items ({{ count_items }})
+        </h5>
+        <a class="add-task-btn tasks-header-toggler"
+           href="#" @click="getItemsProject" style="position: relative;left: 0"><span> ${ scoreI }/5</span></a>
+    </div>
+    <!--START - Tasks List-->
+    <div class="tasks-list-w" style="display: none">
+        <p>
+            En esta sección encontrarás cada uno de los items que conforman el proyecto que estás calificando.
+        </p>
+        {% include 'evaluator/qualified/items.html' %}
+    </div>
+</div>

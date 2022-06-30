@@ -37,12 +37,18 @@ let app = createApp({
                 id: '',
                 title: '',
             },
+            scoreG: 0,
+            scoreI: 0,
+            scoreF: 0,
+            scoreT: 0,
         }
     },
     created() {
+        this.getScores();
     },
     mounted() {
         this.setDescription();
+
     },
     computed: {
         isFilesGallery() {
@@ -52,9 +58,96 @@ let app = createApp({
         isEditable() {
             console.log(this.status)
             return !(this.status === 'send' || this.status === 'qualified')
+        },
+        style_score () {
+            if(this.scoreT >= 4) {
+                return '#4caf50'
+            }
+
+            if(this.scoreT >= 3) {
+                return '#ffc107'
+            }
+
+            return '#ff5252'
         }
     },
     methods: {
+        getScores() {
+            let vm = this;
+            fetch(
+                "{% url 'evaluator:get_scores' project.id %}"
+            ).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.log('..........................')
+                            console.log(response)
+                            vm.scoreG = response.score_g;
+                            vm.scoreI = response.score_i;
+                            vm.scoreF = response.score_f;
+                            vm.scoreT = response.score_t;
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            console.error(response)
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
+        setScore(score, item_id, extra = null){
+            let vm = this;
+            if(extra && extra === "general") {
+                vm.scoreG = score;
+            } else if(extra && extra === "files") {
+                vm.scoreF = score;
+            } else {
+                vm.itemEdit.score = score;
+            }
+
+            vm.questions.filter(item => {
+                if(item.id === item_id) {
+                    item.score = score;
+                }
+            })
+
+            fetch("{% url 'evaluator:get_questions_project' 0 %}", {
+                method: "put",
+                body: JSON.stringify({
+                    'score': score,
+                    'item_id': item_id,
+                    'id_project': vm.id_project,
+                    'extra': extra,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            if (response.message) {
+                                createToast(response.message, response.alert)
+
+                                vm.getScores()
+                            }
+                        });
+                } else {
+                    response.json()
+                        .catch(error => console.log(error))
+                        .then(response => {
+                            createToast(response.message, 'error')
+                        });
+                }
+
+            })
+        },
         setDescription() {
             if ($('#description').length) {
                 CKEDITOR.replace('description');
@@ -241,7 +334,7 @@ let app = createApp({
             fetch("{% url 'writer:add_project' %}", {
                 method: "put",
                 body: JSON.stringify({
-                    'id_project': vm.id_project,
+                    'id': vm.id_project,
                     'title': vm.title,
                     'description': vm.description,
                     'categories': vm.categories,
@@ -275,7 +368,7 @@ let app = createApp({
         getItemsProject() {
             let vm = this;
             fetch(
-                "{% url 'writer:get_questions_project' project.id %}"
+                "{% url 'evaluator:get_questions_project' project.id %}"
             ).then(response => {
                 if (response.status === 200) {
                     response.json()
@@ -305,7 +398,7 @@ let app = createApp({
                 if(item['id'] === id) {
                     item['show'] = !item['show']
                     if(item['show']) {
-                        let url = "{% url 'writer:get_question_detail' 0 %}";
+                        let url = "{% url 'evaluator:get_question_detail' 0 %}";
                         url = url.replace('0', id);
                         fetch(
                             url

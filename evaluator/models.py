@@ -8,6 +8,9 @@ class Evaluator(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.user.username
+
     class Meta:
         db_table = "evaluators"
         verbose_name = "Evaluador"

@@ -1,0 +1,95 @@
+<div class="tasks-section">
+    <div class="tasks-header-w">
+        <a class="tasks-header-toggler" href="#"><i class="os-icon os-icon-ui-23"></i></a>
+        <h5 class="tasks-header tasks-header-toggler">
+            Datos generales
+        </h5>
+        <span class="tasks-sub-header">{{ project.created_at }}</span>
+        <a class="add-task-btn" href="#"><span> ${ scoreG }/5</span></a>
+    </div>
+    <div class="tasks-list-w general-data" style="display: none">
+        <h2>
+            ${ title }
+        </h2>
+        <br>
+        <div v-html="description"></div>
+        <div class="element-box-content">
+            {% for ca in categories_project %}
+                <mark>{{ ca.name }}</mark>
+            {% endfor %}
+        </div>
+        <hr>
+        <h3 class="text-center">Calificación: ${ scoreG }/5</h3>
+        <div class="form-radio">
+            <label class="radio-control">
+                <input type="radio" name="general" value="1" v-model="scoreG" @click="setScore(1, 0, 'general')">
+                1
+            </label>
+            <label class="radio-control">
+                <input type="radio" name="general" value="2" v-model="scoreG" @click="setScore(2, 0, 'general')">
+                2
+            </label>
+            <label class="radio-control">
+                <input type="radio" name="general" value="3" v-model="scoreG" @click="setScore(3, 0, 'general')">
+                3
+            </label>
+            <label class="radio-control">
+                <input type="radio" name="general" value="4" v-model="scoreG" @click="setScore(4, 0, 'general')">
+                4
+            </label>
+            <label class="radio-control">
+                <input type="radio" name="general" value="5" v-model="scoreG" @click="setScore(5, 0, 'general')">
+                5
+            </label>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" class="modal fade" id="editDataGeneralModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header faded smaller">
+                <div class="modal-title">
+                    <span>Editar datos generales</span>
+                </div>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
+                        aria-hidden="true"> &times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="title">Título</label>
+                            <input class="form-control" name="title" id="title"
+                                   placeholder="Ingresa un título"
+                                   type="text" v-model="title">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Description</label>
+                            <textarea class="form-control" name="description" id="description" rows="3">
+                                </textarea>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="categories">Categoría</label>
+                            <select class="form-control select2" v-model="categories"
+                                    name="categories" id="categories"
+                                    multiple>
+                                {% for c in categories %}
+                                    <option value="{{ c.id }}">
+                                        {{ c.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer buttons-on-left">
+                <button class="btn btn-teal" type="button" @click="fetchProject()">Guardar cambios</button>
+                <button class="btn btn-link" data-dismiss="modal" type="button"> Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

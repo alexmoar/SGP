@@ -31,6 +31,9 @@ class Project(BaseModel):
     status = models.CharField(max_length=15, choices=STATUS, default=CREATED)
     category = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         db_table = "projects"
         verbose_name = "Proyecto"
@@ -84,6 +87,9 @@ class Question(BaseModel):
         related_name="questions"
     )
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         db_table = "questions"
         verbose_name = "Pregunta"
@@ -103,10 +109,18 @@ class Comment(BaseModel):
 
 
 class Score(BaseModel):
-    score = models.DecimalField(max_digits=2, decimal_places=2)
+    GENERAL = "general"
+    FILES = "files"
+    TYPE_EXTRA = [
+        (GENERAL, "Descripción general"),
+        (FILES, "Archivos"),
+    ]
+
+    score = models.DecimalField(max_digits=3, decimal_places=2)
     evaluator = models.ForeignKey(Evaluator, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
+    extra = models.CharField(max_length=10, choices=TYPE_EXTRA, default="", null=True, blank=True)
 
     class Meta:
         db_table = "scores"

@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from django.views import View
 
 from authentication.models import UserInformation
+from evaluator.models import Evaluator
 
 
 def redirect_session(request):
@@ -81,6 +82,10 @@ class SignUpView(View):
             )
             user_information.save()
             user = authenticate(request, username=username, password=password)
+
+            if user_information.role == UserInformation.EVALUATOR:
+                Evaluator.objects.create(user=user)
+
             if user is not None:
                 login(request, user)
                 return redirect(reverse_lazy('authentication:redirect_session'))
