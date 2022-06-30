@@ -155,7 +155,6 @@ let app = createApp({
         },
         fetchProject(step) {
             let vm = this;
-            alert(vm.id_project ? "put" : "post")
             fetch("{% url 'writer:add_project' %}", {
                 method: vm.id_project ? "put" : "post",
                 body: JSON.stringify({
