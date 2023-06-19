@@ -26,7 +26,7 @@ class EvaluatorController:
         sum_items = items.aggregate(Sum('score')) if items else {}
         s_t = sum_items.get('score__sum') if sum_items else 0
         score_t = round(((s_t + score_f + score_g) / total), 2)
-        score_i = round((s_t / items.count()), 2)
+        score_i = round((s_t / items.count()), 2) if items else 0
 
         return {
             'score_t': score_t,
