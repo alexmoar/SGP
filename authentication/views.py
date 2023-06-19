@@ -12,7 +12,7 @@ from evaluator.models import Evaluator
 
 def redirect_session(request):
     if request.user.is_authenticated:
-        user = UserInformation.objects.get(id=request.user.id)
+        user = UserInformation.objects.get(user_id=request.user.id)
         if user.role == UserInformation.ADMIN:
             return redirect(reverse_lazy('administrator:dashboard'))
         elif user.role == UserInformation.EVALUATOR:
