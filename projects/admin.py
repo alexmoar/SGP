@@ -22,11 +22,11 @@ class ProjectAdmin(admin.ModelAdmin):
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('title', 'answer', 'project')
 
-    list_filter = ('project')
+    list_filter = ('project',)
 
 
 @admin.register(Comment)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('author', 'project')
 
-    list_filter = ('project')
+    list_filter = ('project',)

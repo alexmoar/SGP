@@ -7,5 +7,5 @@ from evaluator.models import Evaluator
 
 
 @admin.register(Evaluator)
-class OptionMenuAdmin(admin.ModelAdmin):
-    list_display = ('user', 'category')
+class EvaluatorAdmin(admin.ModelAdmin):
+    list_display = ('user',)
